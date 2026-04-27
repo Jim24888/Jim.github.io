@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9377游戏广告投放平台 - 任务中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E293B',
+                        secondary: '#3B82F6',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        gray: {
+                            100: '#F3F4F6',
+                            200: '#E5E7EB',
+                            300: '#D1D5DB',
+                            400: '#9CA3AF',
+                            500: '#6B7280',
+                            600: '#4B5563',
+                            700: '#374151',
+                            800: '#1F2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item-active {
+                @apply bg-blue-600 text-white;
+            }
+            .progress-bar {
+                @apply h-2 rounded-full bg-gray-200 overflow-hidden;
+            }
+            .progress-bar-fill {
+                @apply h-full bg-blue-500 transition-all duration-300;
+            }
+            .status-tag {
+                @apply px-2 py-0.5 rounded text-xs font-medium;
+            }
+        }
+
+        /* 需求文档面板样式 */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        #reqDocPanel { transition: box-shadow 0.2s ease; }
+        #reqDocPanel:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.18); }
+        #reqDocContent p { margin-bottom: 10px; }
+        #reqDocContent ul { list-style: disc inside; padding-left: 8px; margin-bottom: 10px; }
+        #reqDocContent li { margin-bottom: 6px; line-height: 1.7; }
+        #reqDocDots span { transition: all 0.25s ease; cursor: pointer; }
+        #reqDocDots span.active { transform: scale(1.3); }
+        .req-section-title { color: #1e293b; font-weight: 700; font-size: 14px; margin-bottom: 8px; padding-left: 8px; border-left: 3px solid #3b82f6; }
+        .req-highlight { background: linear-gradient(120deg, #dbeafe 0%, #bfdbfe 100%); padding: 12px 16px; border-radius: 8px; margin: 12px 0; }
+        .req-table-mini { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+        .req-table-mini th, .req-table-mini td { border: 1px solid #e2e8f0; padding: 6px 10px; text-align: left; }
+        .req-table-mini th { background: #f8fafc; font-weight: 600; color: #475569; }
+        .req-badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+        .req-badge-new { background: #dcfce7; color: #166534; }
+        .req-badge-old { background: #f1f5f9; color: #475569; }
+        .req-flow-step { position: relative; padding-left: 24px; margin-bottom: 16px; }
+        .req-flow-step::before { content: ''; position: absolute; left: 7px; top: 28px; bottom: -16px; width: 2px; background: #e2e8f0; }
+        .req-flow-step:last-child::before { display: none; }
+        .req-flow-num { position: absolute; left: 0; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; color: white; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <!-- 顶部导航栏 -->
+    <header class="bg-primary text-white h-12 fixed top-0 left-0 right-0 z-50 flex items-center">
+        <div class="flex items-center px-4">
+            <div class="flex items-center mr-6">
+                <span class="text-lg font-bold">9377</span>
+                <span class="ml-1 text-sm">游戏</span>
+                <span class="ml-2 text-sm">广告投放平台</span>
+            </div>
+            <div class="flex items-center space-x-1">
+                <button class="px-3 py-2 text-sm hover:bg-gray-700 rounded">
+                    <i class="fa fa-bars mr-1"></i>
+                </button>
+                <nav class="flex space-x-1">
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">头条</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">快手</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">广点通</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">百度</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">UC</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">B站</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">硬核</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">财务</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">数据集</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">系统</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">素材</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">数据源</a>
+                    <a href="#" class="px-3 py-2 bg-blue-600 rounded">工具</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">AI素材分析系统</a>
+                    <a href="#" class="px-3 py-2 text-sm hover:bg-gray-700 rounded">收藏</a>
+                </nav>
+            </div>
+        </div>
+        <div class="ml-auto flex items-center pr-4">
+            <div class="flex items-center">
+                <img src="https://picsum.photos/32/32" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                <span class="text-sm">卢佩诗</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <div class="flex pt-12 h-screen">
+        <!-- 左侧侧边栏 -->
+        <aside class="w-48 bg-gray-800 text-white h-full overflow-y-auto">
+            <nav class="py-2">
+                <a href="#" class="flex items-center px-4 py-2.5 text-sm hover:bg-gray-700">
+                    <i class="fa fa-table mr-3 w-4 text-center"></i>
+                    报表导出列表
+                </a>
+                <a href="#" class="flex items-center px-4 py-2.5 text-sm hover:bg-gray-700">
+                    <i class="fa fa-bell mr-3 w-4 text-center"></i>
+                    头条消息推送设置
+                </a>
+                <a href="#" class="flex items-center px-4 py-2.5 text-sm sidebar-item-active">
+                    <i class="fa fa-tasks mr-3 w-4 text-center"></i>
+                    任务中心列表
+                </a>
+                <div class="border-t border-gray-700 my-1"></div>
+                <div class="px-4 py-2">
+                    <button class="flex items-center justify-between w-full text-sm hover:text-gray-200">
+                        <span class="flex items-center">
+                            <i class="fa fa-refresh mr-3 w-4 text-center"></i>
+                            数据同步
+                        </span>
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                </div>
+                <div class="px-4 py-2">
+                    <button class="flex items-center justify-between w-full text-sm hover:text-gray-200">
+                        <span class="flex items-center">
+                            <i class="fa fa-credit-card mr-3 w-4 text-center"></i>
+                            付费上报
+                        </span>
+                        <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 右侧主内容 -->
+        <main class="flex-1 p-4 overflow-auto">
+            <!-- 筛选栏 - 带联动功能 -->
+            <div class="bg-white rounded shadow-sm p-4 mb-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center">
+                        <label class="text-sm text-gray-600 mr-2">创建时间</label>
+                        <div class="flex items-center">
+                            <input type="date" class="border border-gray-300 rounded px-2 py-1 text-sm w-36">
+                            <span class="mx-2 text-gray-500">→</span>
+                            <input type="date" class="border border-gray-300 rounded px-2 py-1 text-sm w-36">
+                            <button class="ml-1 text-gray-500 hover:text-gray-700">
+                                <i class="fa fa-calendar-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 主任务类型 -->
+                    <div class="flex items-center">
+                        <label class="text-sm text-gray-600 mr-2">主任务类型</label>
+                        <select id="mainTaskType" class="border border-gray-300 rounded px-2 py-1 text-sm w-48" onchange="changeSubTask()">
+                            <option value="">全部</option>
+                            <option value="material">素材关停任务</option>
+                            <option value="ad_config">广告配置批量调整任务</option>
+                        </select>
+                    </div>
+                    <!-- 子任务类型 -->
+                    <div class="flex items-center">
+                        <label class="text-sm text-gray-600 mr-2">子任务类型</label>
+                        <select id="subTaskType" class="border border-gray-300 rounded px-2 py-1 text-sm w-56">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <!-- 任务状态 -->
+                    <div class="flex items-center">
+                        <label class="text-sm text-gray-600 mr-2">任务状态</label>
+                        <select id="taskStatus" class="border border-gray-300 rounded px-2 py-1 text-sm w-48" onchange="filterTable()">
+                            <option value="">请选择任务状态</option>
+                            <option value="pending">等待执行</option>
+                            <option value="running">正在执行</option>
+                            <option value="completed">已完成</option>
+                            <option value="partial_success">部分成功</option>
+                            <option value="cancelled">已取消</option>
+                            <option value="failed">失败</option>
+                        </select>
+                    </div>
+                    <!-- 媒体类型 -->
+                    <div class="flex items-center">
+                        <label class="text-sm text-gray-600 mr-2">媒体类型</label>
+                        <select id="mediaType" class="border border-gray-300 rounded px-2 py-1 text-sm w-32" onchange="changeSubTask()">
+                            <option value="">全部</option>
+                            <option value="toutiao" selected>头条</option>
+                            <option value="tencent">腾讯</option>
+                        </select>
+                    </div>
+                    <button class="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700 ml-auto">
+                        查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 表格区域 -->
+            <div class="bg-white rounded shadow-sm">
+                <div class="flex justify-end items-center p-3 border-b border-gray-200">
+                    <button class="text-gray-500 hover:text-gray-700 mr-4">
+                        <i class="fa fa-refresh"></i>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                                <th class="px-4 py-3 text-left font-medium">任务ID</th>
+                                <th class="px-4 py-3 text-left font-medium">主任务类型</th>
+                                <th class="px-4 py-3 text-left font-medium">子任务类型</th>
+                                <th class="px-4 py-3 text-left font-medium">媒体类型</th>
+                                <th class="px-4 py-3 text-left font-medium">操作对象数量</th>
+                                <th class="px-4 py-3 text-left font-medium">创建时间</th>
+                                <th class="px-4 py-3 text-left font-medium">创建人</th>
+                                <th class="px-4 py-3 text-left font-medium">任务进度</th>
+                                <th class="px-4 py-3 text-left font-medium">任务状态</th>
+                                <th class="px-4 py-3 text-left font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm" id="taskTableBody">
+                            <!-- 由 JS 动态渲染 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="flex justify-end items-center p-4 text-sm">
+                    <span class="text-gray-600 mr-4">第 1-4 条/总共 4 条</span>
+                    <div class="flex items-center">
+                        <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded-l bg-gray-100 text-gray-400 cursor-not-allowed">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <button class="w-7 h-7 flex items-center justify-center border border-gray-300 bg-blue-600 text-white">1</button>
+                        <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded-r bg-gray-100 text-gray-400 cursor-not-allowed">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <select class="ml-4 border border-gray-300 rounded px-2 py-1 text-sm">
+                        <option value="20">20 条/页</option>
+                        <option value="50">50 条/页</option>
+                        <option value="100">100 条/页</option>
+                    </select>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 任务详情侧边栏 -->
+    <div id="taskDetailSidebar" class="fixed top-0 right-0 w-[70%] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[100] flex flex-col">
+        <!-- 侧边栏头部 -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">任务详情</h3>
+            <button onclick="closeDetailSidebar()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- 侧边栏内容区（动态填充） -->
+        <div id="detailContent" class="flex-1 overflow-auto p-6">
+            <!-- 内容由JS动态生成 -->
+        </div>
+    </div>
+    <!-- 可拖动需求文档面板 -->
+    <div id="reqDocPanel" class="fixed z-[200] bg-white rounded-lg shadow-2xl border border-gray-200 w-[400px] select-none transition-all duration-300 ease-in-out" style="left:20px;top:60px;">
+        <!-- 拖动头部 -->
+        <div id="reqDocHeader" class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-t-lg cursor-move user-select-none">
+            <div class="flex items-center">
+                <i class="fa fa-file-text-o mr-2 text-sm"></i>
+                <span class="font-semibold text-sm">需求说明文档</span>
+                <span id="reqDocMiniTitle" class="hidden ml-3 text-xs opacity-80 max-w-[200px] truncate"></span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+                <button id="reqDocCollapse" class="w-6 h-6 flex items-center justify-center hover:bg-blue-400 rounded transition-colors" title="收起/展开">
+                    <i class="fa fa-chevron-down text-xs transition-transform duration-200"></i>
+                </button>
+                <button id="reqDocClose" class="w-6 h-6 flex items-center justify-center hover:bg-red-400 rounded transition-colors" title="关闭">
+                    <i class="fa fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div id="reqDocBody" class="transition-all duration-300 ease-in-out overflow-hidden">
+            <!-- 页面指示器 -->
+            <div class="px-5 pt-4 pb-0">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                    <span id="reqDocPageTitle" class="text-base font-bold text-gray-800">概述</span>
+                    <div class="flex items-center space-x-1">
+                        <button id="reqPrevPage" class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 text-gray-500 disabled:opacity-30" disabled>
+                            <i class="fa fa-chevron-left text-xs"></i>
+                        </button>
+                        <span id="reqDocPageIndicator" class="text-sm text-gray-600 px-2">1 / 5</span>
+                        <button id="reqNextPage" class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 text-gray-500">
+                            <i class="fa fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 页面内容容器 -->
+                <div id="reqDocContent" class="min-h-[280px] max-h-[360px] overflow-y-auto text-sm leading-relaxed text-gray-700 pr-1 custom-scrollbar pb-3">
+                    <!-- 由 JS 动态填充 -->
+                </div>
+
+                <!-- 页码圆点导航 -->
+                <div id="reqDocDots" class="flex justify-center mt-3 pt-3 border-t border-gray-100 space-x-2 pb-4">
+                    <!-- JS动态生成圆点 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 收起状态（仅显示标题条） -->
+        <div id="reqDocCollapsedBar" class="hidden cursor-pointer bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg shadow-md hover:shadow-lg transition-shadow" onclick="toggleReqDocPanel()">
+            <div class="flex items-center justify-between px-4 py-2.5 text-white">
+                <div class="flex items-center min-w-0">
+                    <i class="fa fa-file-text-o mr-2 text-sm flex-shrink-0"></i>
+                    <span id="reqDocCollapsedTitle" class="font-medium text-sm truncate">需求说明</span>
+                    <span id="reqDocCollapsedPage" class="ml-2 text-xs opacity-70 flex-shrink-0">(1/5)</span>
+                </div>
+                <i class="fa fa-chevron-up ml-2 text-xs flex-shrink-0 opacity-70"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遮罩层 -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 z-[99] hidden" onclick="closeDetailSidebar()"></div>
+
+    <!-- 筛选联动JS & 数据过滤 -->
+    <script>
+        // 定义任务配置数据
+        const taskConfig = {
+            // 素材关停任务子任务
+            material: [
+                { value: 'material_personal', label: '停用素材_停用所有已选素材在投状态(个人)' },
+                { value: 'material_all', label: '停用素材_停用所有已选素材在投状态(全员)' }
+            ],
+            // 广告配置调整任务 - 头条
+            ad_config_toutiao: [
+                { value: 'toutiao_enable', label: '启用' },
+                { value: 'toutiao_pause', label: '暂停' },
+                { value: 'toutiao_delete', label: '删除' },
+                { value: 'toutiao_budget', label: '更改预算' },
+                { value: 'toutiao_budget_next', label: '更改次日预算' },
+                { value: 'toutiao_roi', label: '更改ROI系数' },
+                { value: 'toutiao_time', label: '更改时间' },
+                { value: 'toutiao_period', label: '更改时段' },
+                { value: 'toutiao_area', label: '更改地区' },
+                { value: 'toutiao_price', label: '更改出价' },
+                { value: 'toutiao_create_plan', label: '新建起量计划' },
+                { value: 'toutiao_close_plan', label: '关闭起量计划' }
+            ],
+            // 广告配置调整任务 - 腾讯
+            ad_config_tencent: [
+                { value: 'tencent_enable', label: '启用' },
+                { value: 'tencent_pause', label: '暂停' },
+                { value: 'tencent_delete', label: '删除广告' },
+                { value: 'tencent_budget', label: '更改预算' },
+                { value: 'tencent_price', label: '更改出价' },
+                { value: 'tencent_deep_price', label: '更改深度出价' },
+                { value: 'tencent_roi', label: '更改ROI系数' },
+                { value: 'tencent_boost', label: '更改一键起量' },
+                { value: 'tencent_date', label: '更改投放日期' },
+                { value: 'tencent_period', label: '更改投放时段' }
+            ]
+        };
+
+        // 示例任务数据（完整版）
+        const taskData = [
+            {
+                id: 12, mainType: '素材关停任务', subType: '停用素材_停用所有已选素材在投状态(个人)',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-17 11:09:39', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 3
+            },
+            {
+                id: 11, mainType: '素材关停任务', subType: '停用素材_停用所有已选素材在投状态(全员)',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-17 10:20:15', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 7
+            },
+            // 头条广告配置调整任务示例数据
+            {
+                id: 101, mainType: '广告配置批量调整任务', subType: '启用',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-20 08:30:00', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 3
+            },
+            {
+                id: 102, mainType: '广告配置批量调整任务', subType: '暂停',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-20 09:15:22', creator: '卢佩诗', progress: 78, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 2
+            },
+            {
+                id: 103, mainType: '广告配置批量调整任务', subType: '删除',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-19 14:20:33', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 104, mainType: '广告配置批量调整任务', subType: '更改预算',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-19 16:45:10', creator: '卢佩诗', progress: 50, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 2
+            },
+            {
+                id: 105, mainType: '广告配置批量调整任务', subType: '更改次日预算',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-18 10:00:05', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 1
+            },
+            {
+                id: 106, mainType: '广告配置批量调整任务', subType: '更改ROI系数',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-20 14:32:18', creator: '卢佩诗', progress: 65, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 3
+            },
+            {
+                id: 107, mainType: '广告配置批量调整任务', subType: '更改时间',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-18 11:30:44', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 1
+            },
+            {
+                id: 108, mainType: '广告配置批量调整任务', subType: '更改时段',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-17 15:22:18', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 109, mainType: '广告配置批量调整任务', subType: '更改地区',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-16 09:45:30', creator: '卢佩诗', progress: 0, status: '等待执行', statusClass: 'bg-gray-100 text-gray-600',
+                targetCount: 1
+            },
+            {
+                id: 110, mainType: '广告配置批量调整任务', subType: '更改出价',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-20 13:55:12', creator: '卢佩诗', progress: 35, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 2
+            },
+            {
+                id: 111, mainType: '广告配置批量调整任务', subType: '新建起量计划',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-19 08:20:00', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 112, mainType: '广告配置批量调整任务', subType: '关闭起量计划',
+                mediaType: '头条', mediaValue: 'toutiao',
+                createTime: '2026-04-18 17:40:28', creator: '卢佩诗', progress: 80, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 1
+            },
+            // 腾讯广告配置调整任务示例数据
+            {
+                id: 201, mainType: '广告配置批量调整任务', subType: '启用',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-20 07:50:15', creator: '卢佩诗', progress: 90, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 3
+            },
+            {
+                id: 202, mainType: '广告配置批量调整任务', subType: '删除广告',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-19 13:10:33', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 13, mainType: '广告配置批量调整任务', subType: '更改预算',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-19 16:48:25', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 204, mainType: '广告配置批量调整任务', subType: '更改出价',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-20 10:25:40', creator: '卢佩诗', progress: 45, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 1
+            },
+            {
+                id: 205, mainType: '广告配置批量调整任务', subType: '更改深度出价',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-18 14:55:08', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            },
+            {
+                id: 206, mainType: '广告配置批量调整任务', subType: '更改ROI系数',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-19 09:30:22', creator: '卢佩诗', progress: 60, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 2
+            },
+            {
+                id: 207, mainType: '广告配置批量调整任务', subType: '更改一键起量',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-17 16:40:50', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 1
+            },
+            {
+                id: 208, mainType: '广告配置批量调整任务', subType: '更改投放日期',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-20 11:15:33', creator: '卢佩诗', progress: 20, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                targetCount: 1
+            },
+            {
+                id: 209, mainType: '广告配置批量调整任务', subType: '更改投放时段',
+                mediaType: '腾讯', mediaValue: 'tencent',
+                createTime: '2026-04-18 08:45:16', creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                targetCount: 2
+            }
+        ];
+
+        // 子任务联动切换函数
+        function changeSubTask() {
+            const mainType = document.getElementById('mainTaskType').value;
+            const mediaType = document.getElementById('mediaType').value;
+            const subSelect = document.getElementById('subTaskType');
+            
+            // 清空子任务选项
+            subSelect.innerHTML = '<option value="">全部</option>';
+            
+            // 根据主任务类型加载对应子任务
+            if (mainType === 'material') {
+                // 素材关停任务：加载固定子任务
+                taskConfig.material.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.label;
+                    subSelect.appendChild(option);
+                });
+            } else if (mainType === 'ad_config') {
+                // 广告配置调整任务：根据媒体类型加载
+                if (mediaType === 'toutiao') {
+                    taskConfig.ad_config_toutiao.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value;
+                        option.textContent = item.label;
+                        subSelect.appendChild(option);
+                    });
+                } else if (mediaType === 'tencent') {
+                    taskConfig.ad_config_tencent.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value;
+                        option.textContent = item.label;
+                        subSelect.appendChild(option);
+                    });
+                } else if (mediaType === '') {
+                    // 媒体类型为全部时，显示提示
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = '-- 请先选择媒体类型 --';
+                    option.disabled = true;
+                    subSelect.appendChild(option);
+                }
+            }
+
+            // 自动触发查询刷新表格
+            filterTable();
+        }
+
+        // 过滤并渲染表格
+        function filterTable() {
+            const mainType = document.getElementById('mainTaskType').value;
+            const subType = document.getElementById('subTaskType').value;
+            const mediaType = document.getElementById('mediaType').value;
+            const statusValue = document.getElementById('taskStatus').value;
+
+            // 当前登录用户名（取自顶部导航栏）
+            const currentUser = '卢佩诗';
+
+            // 过滤数据
+            let filtered = taskData.filter(item => {
+                // 默认仅显示本人创建的任务
+                if (item.creator !== currentUser) return false;
+
+                // 主任务类型过滤
+                if (mainType && !(
+                    (mainType === 'material' && item.mainType === '素材关停任务') ||
+                    (mainType === 'ad_config' && item.mainType === '广告配置批量调整任务')
+                )) return false;
+
+                // 媒体类型过滤
+                if (mediaType && item.mediaValue !== mediaType) return false;
+
+                // 子任务类型过滤
+                if (subType && item.subType !== subType) return false;
+
+                // 任务状态过滤
+                if (statusValue) {
+                    const statusMap = {
+                        'pending': '等待执行',
+                        'running': '正在执行',
+                        'completed': '已完成',
+                        'partial_success': '部分成功',
+                        'cancelled': '已取消',
+                        'failed': '失败'
+                    };
+                    if (item.status !== statusMap[statusValue]) return false;
+                }
+
+                return true;
+            });
+
+            // 渲染表格
+            renderTable(filtered);
+        }
+
+        // 渲染表格数据
+        function renderTable(data) {
+            const tbody = document.getElementById('taskTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="px-4 py-8 text-center text-gray-400">
+                            <i class="fa fa-inbox text-3xl mb-2 block"></i>
+                            暂无符合条件的数据
+                        </td>
+                    </tr>`;
+                updatePagination(0, 0, 1);
+                return;
+            }
+
+            const mediaColorMap = {
+                '头条': 'bg-blue-100 text-blue-600',
+                '腾讯': 'bg-green-100 text-green-600'
+            };
+
+            tbody.innerHTML = data.map(item => `
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="px-4 py-3">${item.id}</td>
+                    <td class="px-4 py-3 font-medium">${item.mainType}</td>
+                    <td class="px-4 py-3">${item.subType}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-0.5 ${mediaColorMap[item.mediaType] || ''} rounded text-xs">${item.mediaType}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center justify-center min-w-[28px] h-6 px-2 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">${item.targetCount || 0}</span>
+                    </td>
+                    <td class="px-4 py-3">${item.createTime}</td>
+                    <td class="px-4 py-3">${item.creator}</td>
+                    <td class="px-4 py-3 w-32">
+                        <div class="flex items-center">
+                            <div class="progress-bar flex-1 mr-2">
+                                <div class="progress-bar-fill" style="width: ${item.progress}%"></div>
+                            </div>
+                            <span class="text-xs">${item.progress}%</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <span class="status-tag ${item.statusClass}">${item.status}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <a href="#" class="text-gray-400 hover:text-gray-600 mr-3">重试</a>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 detail-link" data-task-id="${item.id}">详情</a>
+                    </td>
+                </tr>`).join('');
+
+            updatePagination(data.length, data.length, 1);
+        }
+
+        // 更新分页信息
+        function updatePagination(total, currentTotal, page) {
+            const pageInfo = document.querySelector('.flex.justify-end.items-center.p-4 span');
+            if (pageInfo) {
+                pageInfo.textContent = `第 1-${currentTotal} 条/总共 ${total} 条`;
+            }
+        }
+
+        // 查询按钮绑定 & 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== 页面加载时的初始化 =====
+            // 1. 媒体类型默认已选"头条"，触发子任务联动
+            changeSubTask();
+
+            // 给查询按钮添加事件
+            const queryBtn = document.querySelector('button.bg-blue-600.text-white');
+            if (queryBtn) {
+                queryBtn.addEventListener('click', filterTable);
+            }
+
+            // 给所有筛选项添加change事件
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    // 如果不是主任务和媒体类型的联动，也触发过滤
+                    if (!this.id) {
+                        filterTable();
+                    }
+                });
+            });
+
+            // 绑定表格中"详情"链接的点击事件（使用事件委托）
+            document.getElementById('taskTableBody').addEventListener('click', function(e) {
+                const detailLink = e.target.closest('.detail-link');
+                if (detailLink) {
+                    e.preventDefault();
+                    const taskId = parseInt(detailLink.getAttribute('data-task-id'));
+                    openDetailSidebar(taskId);
+                }
+            });
+        });
+
+        // ==================== 任务详情侧边栏相关 ====================
+
+        // 素材停用任务的详情数据（每条item含独立进度与状态）
+        const materialDetailData = {
+            11: { // 腾讯 - 全员停用
+                batchId: '1', ownerId: '16', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600',
+                creator: '卢佩诗', progress: 86, status: '部分成功', statusClass: 'bg-amber-100 text-amber-700',
+                batches: [
+                    {
+                        batchNum: 1, items: [
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: 'gzg-测试组件化创意-不指定创意形式_创意1_04_10_03:24:32', projectName: 'mpjwlk_jzcqfyd5-试玩页名称测试-3-0320-3076', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '优投创意_组件化创意_不指定创意形式_创意1_03_19_09:21:50', projectName: '优投项目_mpjwlk_jzcqfyd5_测试-1-0304-5761', progress: 45, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '优投创意_组件化创意_不指定创意形式_创意1_03_19_09:30:26', projectName: '优投项目_mpjwlk_jzcqfyd5_测试-1-0304-5761', progress: 72, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '组件化创意-不指定创意形式_创意1_03_19_09:21:50', projectName: 'mpjwlk_jzcqfyd5-测试-1-0304-5761', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '组件化创意-不指定创意形式_创意1_03_19_09:30:26', projectName: 'mpjwlk_jzcqfyd5-测试-1-0304-5761', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '优投创意_组件化创意_不指定创意形式_创意1_03_19_09:30:26', projectName: '优投项目_mpjwlk_jzcqfyd5_测试-1-0304-5761', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                            { materialName: '2026.03.13-福利首充+剑仙吸尘器+普充玩创仙720-45s-720x1280-cesshisssss-黄正根_黄正根.mp4', adName: '优投创意_组件化创意_不指定创意形式_创意1_03_19_09:21:50', projectName: '优投项目_mpjwlk_jzcqfyd5_测试-1-0304-5761', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                        ]
+                    }
+                ]
+            },
+            12: { // 头条 - 个人停用
+                batchId: '2', ownerId: '18', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600',
+                creator: '卢佩诗', progress: 67, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                batches: [
+                    {
+                        batchNum: 1, items: [
+                            { materialName: '2026.04.15-热血江湖-剑气纵横-60s-1080x1920-test_user01.mp4', adName: '自定义创意_热血江湖_04_17_10:22:10', projectName: '热血头条_测试B-0417-8822', progress: 0, status: '等待执行', statusClass: 'bg-gray-100 text-gray-600' },
+                            { materialName: '2026.04.16-9377传奇-霸业长歌-45s-720x1280-test_user02.mp4', adName: '程序化创意_传奇霸业_04_17_11:05:48', projectName: '传奇头条_投放组C-0417-9933', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                            { materialName: '2026.04.15-热血江湖-剑气纵横-60s-1080x1920-test_user01.mp4', adName: '原生创意_热血江湖_04_17_10:15:33', projectName: '热血头条_测试A-0417-8821', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // 广告配置批量调整任务的详情数据（每条item含独立进度与状态）
+        const adConfigDetailData = {
+            101: { // 头条-启用
+                batchId: 'TT001', ownerId: 'WXX01', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '启用',
+                items: [
+                    { mediaAccount: '头条账号-A_游戏投放部', projectName: '9377传奇霸业-Q1大推计划', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '头条账号-B_手游推广组', projectName: '热血江湖-新服引流计划', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '头条账号-C_效果广告团队', projectName: '9377全民坦克-周末放量计划', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            102: { // 头条-暂停
+                batchId: 'TT002', ownerId: 'LMH02', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 78, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '暂停',
+                items: [
+                    { mediaAccount: '头条账号-D_华东区域', projectName: '魔域手游-春节档回收计划', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '头条账号-E_华南运营组', projectName: '9377征途-老用户召回计划', progress: 56, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            103: { // 头条-删除
+                batchId: 'TT003', ownerId: 'ZSQ03', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 50, status: '部分成功', statusClass: 'bg-amber-100 text-amber-700',
+                subType: '删除',
+                items: [
+                    { mediaAccount: '头条账号-F_测试组', projectName: '测试计划-待删除01', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '头条账号-F_测试组', projectName: '测试计划-待删除02', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            104: { // 头条-更改预算
+                batchId: 'TT004', ownerId: 'CZY04', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 50, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改预算',
+                items: [
+                    { mediaAccount: '头条账号-G_核心投放', projectName: '传奇霸业-日耗5000计划', progress: 30, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                    { mediaAccount: '头条账号-H_品牌推广', projectName: '9377品牌-暑期预热', progress: 70, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            105: { // 头条-更改次日预算
+                batchId: 'TT005', ownerId: 'ZYQ05', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '更改次日预算',
+                items: [
+                    { mediaAccount: '头条账号-I_增量投放', projectName: '全民坦克-次日扩量', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            106: { // 头条-更改ROI系数
+                batchId: 'TT006', ownerId: 'WXX01', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 65, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改ROI系数',
+                items: [
+                    { mediaAccount: '头条账号-K_数据驱动', projectName: '9377征途-智能出价优化', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '头条账号-J_ROI优化组', projectName: '热血江湖-ROI系数调整计划A', progress: 80, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                    { mediaAccount: '头条账号-J_ROI优化组', projectName: '热血江湖-ROI系数调整计划B', progress: 115, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            107: { // 头条-更改时间
+                batchId: 'TT007', ownerId: 'WXF06', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '更改时间',
+                items: [
+                    { mediaAccount: '头条账号-L_排期管理', projectName: '魔域手游-投放时间调整', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            108: { // 头条-更改时段
+                batchId: 'TT008', ownerId: 'ZYW07', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '更改时段',
+                items: [
+                    { mediaAccount: '头条账号-M_时段优化', projectName: '9377全民坦克-晚间时段加投', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '头条账号-M_时段优化', projectName: '传奇霸业-早高峰时段调整', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            109: { // 头条-更改地区
+                batchId: 'TT009', ownerId: 'SHR08', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 0, status: '等待执行', statusClass: 'bg-gray-100 text-gray-600',
+                subType: '更改地区',
+                items: [
+                    { mediaAccount: '头条账号-N_地域定向', projectName: '热血江湖-华东地区定向', progress: 0, status: '等待执行', statusClass: 'bg-gray-100 text-gray-600' }
+                ]
+            },
+            110: { // 头条-更改出价
+                batchId: 'TT010', ownerId: 'QDD09', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 35, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改出价',
+                items: [
+                    { mediaAccount: '头条账号-O_竞价策略', projectName: '魔域手游-出价提升计划', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '头条账号-P_成本控制', projectName: '9377征途-CPA出价优化', progress: 70, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            111: { // 头条-新建起量计划
+                batchId: 'TT011', ownerId: 'LXX10', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '新建起量计划',
+                items: [
+                    { mediaAccount: '头条账号-Q_起量专项', projectName: '热血江湖-起量计划Alpha', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '头条账号-Q_起量专项', projectName: '传奇霸业-起量计划Beta', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            112: { // 头条-关闭起量计划
+                batchId: 'TT012', ownerID: 'HWJ11', mediaType: '头条', mediaTag: 'bg-blue-100 text-blue-600', mediaValue: 'toutiao',
+                creator: '卢佩诗', progress: 80, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '关闭起量计划',
+                items: [
+                    { mediaAccount: '头条账号-R_起量管理', projectName: '全民坦克-起量到期关闭', progress: 80, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            // ===== 腾讯广告配置调整任务 =====
+            201: { // 腾讯-启用
+                batchId: 'TX001', ownerId: 'LPS01', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 90, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '启用',
+                items: [
+                    { mediaAccount: '广点通账户-主投部门', adName: '9377传奇霸业-广点通主力计划', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '广点通账户-增长组', adName: '热血江湖-广点通新增计划', progress: 85, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                    { mediaAccount: '广点通账户-品牌组', adName: '9377全民坦克-广点通品牌曝光', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' }
+                ]
+            },
+            202: { // 腾讯-删除广告
+                batchId: 'TX002', ownerId: 'HJX02', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '删除广告',
+                items: [
+                    { mediaAccount: '广点通账户-清理组', adName: '过期计划-待清理001', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '广点通账户-清理组', adName: '低效计划-待清理002', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            13: { // 腾讯-更改预算
+                batchId: 'TX003', ownerId: 'LPS01', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 50, status: '部分成功', statusClass: 'bg-amber-100 text-amber-700',
+                subType: '更改预算',
+                items: [
+                    { mediaAccount: '广点通账户-预算管理', adName: '9377征途-预算上调至8000', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '广点通账户-预算管理', adName: '魔域手游-预算下调至3000', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            204: { // 腾讯-更改出价
+                batchId: 'TX004', ownerID: 'LTY03', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 45, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改出价',
+                items: [
+                    { mediaAccount: '广点通账户-出价优化', adName: '热血江湖-oCPM出价调整', progress: 45, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            205: { // 腾讯-更改深度出价
+                batchId: 'TX005', ownerId: 'XZR04', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 50, status: '部分成功', statusClass: 'bg-amber-100 text-amber-700',
+                subType: '更改深度出价',
+                items: [
+                    { mediaAccount: '广点通账户-深度转化', adName: '全民坦克-深度出价目标调整', progress: 0, status: '失败', statusClass: 'bg-red-100 text-red-600' },
+                    { mediaAccount: '广点通账户-深度转化', adName: '9377传奇霸业-深度出价(v2)优化', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            206: { // 腾讯-更改ROI系数
+                batchId: 'TX006', ownerId: 'FSZ05', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 60, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改ROI系数',
+                items: [
+                    { mediaAccount: '广点通账户-ROI调优', adName: '魔域手游-ROI系数从1.2调至1.5', progress: 60, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' },
+                    { mediaAccount: '广点通账户-ROI调优', adName: '9377征途-ROI系数从1.0调至1.3', progress: 60, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            207: { // 腾讯-更改一键起量
+                batchId: 'TX007', ownerId: 'HXM06', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '更改一键起量',
+                items: [
+                    { mediaAccount: '广点通账户-起量工具', adName: '热血江湖-一键起量开启', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            },
+            208: { // 腾讯-更改投放日期
+                batchId: 'TX008', ownerId: 'YZX07', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 20, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600',
+                subType: '更改投放日期',
+                items: [
+                    { mediaAccount: '广点通账户-排期', adName: '9377全民坦克-投放日期延长至五一', progress: 20, status: '正在执行', statusClass: 'bg-blue-100 text-blue-600' }
+                ]
+            },
+            209: { // 腾讯-更改投放时段
+                batchId: 'TX009', ownerId: 'CMY08', mediaType: '腾讯', mediaTag: 'bg-green-100 text-green-600', mediaValue: 'tencent',
+                creator: '卢佩诗', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600',
+                subType: '更改投放时段',
+                items: [
+                    { mediaAccount: '广点通账户-时段', adName: '传奇霸业-投放时段调整为全天', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' },
+                    { mediaAccount: '广点通账户-时段', adName: '魔域手游-投放时段排除凌晨', progress: 100, status: '已完成', statusClass: 'bg-green-100 text-green-600' }
+                ]
+            }
+        };
+
+        /**
+         * 打开任务详情侧边栏
+         * @param {number} taskId - 任务ID
+         */
+        function openDetailSidebar(taskId) {
+            const taskItem = taskData.find(t => t.id === taskId);
+            if (!taskItem) return;
+
+            const sidebar = document.getElementById('taskDetailSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const content = document.getElementById('detailContent');
+
+            let html = '';
+
+            // 判断主任务类型，渲染不同的详情模板
+            if (taskItem.mainType === '素材关停任务') {
+                html = renderMaterialDetail(taskId);
+            } else if (taskItem.mainType === '广告配置批量调整任务') {
+                html = renderAdConfigDetail(taskId);
+            }
+
+            content.innerHTML = html;
+            
+            // 显示侧边栏和遮罩
+            sidebar.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+
+            // 绑定批次行展开/收起事件
+            bindBatchToggleEvents();
+        }
+
+        /** 关闭详情侧边栏 */
+        function closeDetailSidebar() {
+            const sidebar = document.getElementById('taskDetailSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.add('translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        /**
+         * 渲染素材停用任务详情（参考截图样式：批次行 + 展开的素材明细）
+         */
+        function renderMaterialDetail(taskId) {
+            const data = materialDetailData[taskId];
+            if (!data) return '<p class="text-gray-400">暂无详情数据</p>';
+
+            return `
+                <div class="space-y-4">
+                    <!-- 批次概览表头 -->
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 text-sm text-gray-600">
+                                <th class="text-left py-3 px-4 font-medium w-24">批次号</th>
+                                <th class="text-left py-3 px-4 font-medium w-28">主任务id</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">媒体类型</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">创建人</th>
+                                <th class="text-left py-3 px-4 font-medium w-40">任务进度</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">任务状态</th>
+                                <th class="text-left py-3 px-4 font-medium w-16">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.batches.map(batch => {
+                                // 排序：不成功的（进度<100或失败）排在前面
+                                const sortedItems = [...batch.items].sort((a, b) => {
+                                    const aFail = a.progress < 100 || a.status === '失败';
+                                    const bFail = b.progress < 100 || b.status === '失败';
+                                    if (aFail && !bFail) return -1;
+                                    if (!aFail && bFail) return 1;
+                                    return 0;
+                                });
+                                return `
+                                <!-- 批次行 -->
+                                <tr class="border-b border-gray-200 bg-gray-50/50 cursor-pointer hover:bg-gray-100 transition-colors" data-batch="${batch.batchNum}">
+                                    <td class="py-3 px-4">${batch.batchNum}</td>
+                                    <td class="py-3 px-4">${data.ownerId}</td>
+                                    <td class="py-3 px-4"><span class="px-2 py-0.5 ${data.mediaTag} rounded text-xs">${data.mediaType}</span></td>
+                                    <td class="py-3 px-4">${data.creator}</td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center w-40">
+                                            <div class="progress-bar flex-1 mr-2">
+                                                <div class="progress-bar-fill" style="width: ${data.progress}%"></div>
+                                            </div>
+                                            <span class="text-xs">${data.progress}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4"><span class="status-tag ${data.statusClass}">${data.status}</span></td>
+                                    <td class="py-3 px-4"></td>
+                                </tr>
+                                <!-- 展开的明细行（默认展开） -->
+                                <tr class="batch-detail-row" data-batch-parent="${batch.batchNum}">
+                                    <td colspan="7" class="p-0">
+                                        <div class="bg-white">
+                                            <!-- 明细子表头（增加执行进度/状态列） -->
+                                            <table class="w-full ml-8 border-collapse">
+                                                <thead>
+                                                    <tr class="border-b border-gray-200 text-sm text-gray-500">
+                                                        <th class="text-left py-2 px-4 font-medium">素材名称</th>
+                                                        <th class="text-left py-2 px-4 font-medium">广告名称</th>
+                                                        <th class="text-left py-2 px-4 font-medium">项目名称</th>
+                                                        <th class="text-left py-2 px-4 font-medium w-32">执行进度</th>
+                                                        <th class="text-left py-2 px-4 font-medium w-22">执行状态</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${sortedItems.map(item => `
+                                                        <tr class="border-b border-gray-100 hover:bg-gray-50 text-sm ${item.progress < 100 ? 'bg-red-50/30' : ''}">
+                                                            <td class="py-2.5 px-4 max-w-md truncate" title="${item.materialName}">${item.materialName}</td>
+                                                            <td class="py-2.5 px-4 max-w-xs truncate" title="${item.adName}">${item.adName}</td>
+                                                            <td class="py-2.5 px-4 max-w-xs truncate" title="${item.projectName}">${item.projectName}</td>
+                                                            <td class="py-2.5 px-4">
+                                                                <div class="flex items-center w-28">
+                                                                    <div class="progress-bar flex-1 mr-1.5 h-1.5">
+                                                                        <div class="progress-bar-fill" style="width: ${Math.min(item.progress, 100)}%; background-color: ${item.status === '失败' ? '#ef4444' : item.progress === 100 ? '#10b981' : '#3b82f6'}"></div>
+                                                                    </div>
+                                                                    <span class="text-xs text-gray-500">${item.progress}%</span>
+                                                                </div>
+                                                            </td>
+                                                            <td class="py-2.5 px-4">
+                                                                <span class="status-tag ${item.statusClass}">${item.status}</span>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        /**
+         * 渲染广告配置批量调整任务详情
+         * 头条媒体 → 显示：媒体账号、项目名称
+         * 腾讯媒体 → 显示：媒体账号、广告名称
+         */
+        function renderAdConfigDetail(taskId) {
+            const data = adConfigDetailData[taskId];
+            if (!data) return '<p class="text-gray-400">暂无详情数据</p>';
+
+            const isTencent = data.mediaValue === 'tencent';
+            const colHeader2 = isTencent ? '广告名称' : '项目名称';
+
+            // 排序：不成功的（进度<100或失败）排在前面
+            const sortedItems = [...data.items].sort((a, b) => {
+                const aFail = a.progress < 100 || a.status === '失败';
+                const bFail = b.progress < 100 || b.status === '失败';
+                if (aFail && !bFail) return -1;
+                if (!aFail && bFail) return 1;
+                return 0;
+            });
+
+            return `
+                <div class="space-y-4">
+                    <!-- 概览表头 -->
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 text-sm text-gray-600">
+                                <th class="text-left py-3 px-4 font-medium w-24">批次号</th>
+                                <th class="text-left py-3 px-4 font-medium w-28">主任务id</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">媒体类型</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">创建人</th>
+                                <th class="text-left py-3 px-4 font-medium w-40">任务进度</th>
+                                <th class="text-left py-3 px-4 font-medium w-24">任务状态</th>
+                                <th class="text-left py-3 px-4 font-medium w-16">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 批次行（可点击展开） -->
+                            <tr class="border-b border-gray-200 bg-gray-50/50 cursor-pointer hover:bg-gray-100 transition-colors batch-toggle-row" data-batch="1">
+                                <td class="py-3 px-4">1</td>
+                                <td class="py-3 px-4">${data.ownerId || '-'}</td>
+                                <td class="py-3 px-4"><span class="px-2 py-0.5 ${data.mediaTag} rounded text-xs">${data.mediaType}</span></td>
+                                <td class="py-3 px-4">${data.creator}</td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center w-40">
+                                        <div class="progress-bar flex-1 mr-2">
+                                            <div class="progress-bar-fill" style="width: ${data.progress}%"></div>
+                                        </div>
+                                        <span class="text-xs">${data.progress}%</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4"><span class="status-tag ${data.statusClass}">${data.status}</span></td>
+                                <td class="py-3 px-4"></td>
+                            </tr>
+                            <!-- 展开的明细行（默认展开） -->
+                            <tr class="batch-detail-row" data-batch-parent="1">
+                                <td colspan="7" class="p-0">
+                                    <div class="bg-white">
+                                        <table class="w-full ml-8 border-collapse">
+                                            <thead>
+                                                <tr class="border-b border-gray-200 text-sm text-gray-500">
+                                                    <th class="text-left py-2 px-4 font-medium">媒体账号</th>
+                                                    <th class="text-left py-2 px-4 font-medium">${colHeader2}</th>
+                                                    <th class="text-left py-2 px-4 font-medium w-32">执行进度</th>
+                                                    <th class="text-left py-2 px-4 font-medium w-22">执行状态</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${sortedItems.map(item => `
+                                                    <tr class="border-b border-gray-100 hover:bg-gray-50 text-sm ${item.progress < 100 ? 'bg-red-50/30' : ''}">
+                                                        <td class="py-2.5 px-4">${isTencent ? item.mediaAccount : item.mediaAccount}</td>
+                                                        <td class="py-2.5 px-4">${isTencent ? item.adName : item.projectName}</td>
+                                                        <td class="py-2.5 px-4">
+                                                            <div class="flex items-center w-28">
+                                                                <div class="progress-bar flex-1 mr-1.5 h-1.5">
+                                                                    <div class="progress-bar-fill" style="width: ${Math.min(item.progress, 100)}%; background-color: ${item.status === '失败' ? '#ef4444' : item.progress === 100 ? '#10b981' : '#3b82f6'}"></div>
+                                                                </div>
+                                                                <span class="text-xs text-gray-500">${item.progress}%</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="py-2.5 px-4">
+                                                            <span class="status-tag ${item.statusClass}">${item.status}</span>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        /**
+         * 绑定批次行的展开/收起切换事件
+         */
+        function bindBatchToggleEvents() {
+            const toggleRows = document.querySelectorAll('.batch-toggle-row');
+            toggleRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    const batchNum = this.getAttribute('data-batch');
+                    const detailRow = document.querySelector(`.batch-detail-row[data-batch-parent="${batchNum}"]`);
+                    
+                    if (detailRow) {
+                        // 切换显示/隐藏
+                        if (detailRow.style.display === 'none') {
+                            detailRow.style.display = '';
+                            this.querySelector('.fa')?.classList?.remove('fa-chevron-down');
+                            this.querySelector('.fa')?.classList?.add('fa-chevron-up');
+                        } else {
+                            detailRow.style.display = 'none';
+                            // 如果没有图标就添加一个
+                            let icon = this.querySelector('.batch-icon');
+                            if (!icon) {
+                                const firstCell = this.querySelector('td:first-child');
+                                icon = document.createElement('i');
+                                icon.className = 'fa fa-chevron-down batch-icon mr-2 text-gray-400';
+                                firstCell.insertBefore(icon, firstCell.firstChild);
+                            } else {
+                                icon.classList.remove('fa-chevron-up');
+                                icon.classList.add('fa-chevron-down');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // ==================== 需求文档面板（可拖动分页 + 原型高亮） ====================
+
+        // 每页对应原型区域的 CSS 选择器配置
+        const reqDocHighlightMap = {
+            0: null,   // 概述 - 不高亮
+            1: 'filter-area',     // 主任务类型 - 筛选栏
+            2: 'subtask-area',    // 子任务类型差异 - 子任务下拉框区域
+            3: 'table-area',      // 筛选与数据展示 - 整个筛选栏+表格
+            4: 'sidebar'          // 任务详情侧边栏 - 引导点击详情
+        };
+
+        const reqDocPages = [
+            // ===== 第1页：概述 + 文档信息 =====
+            {
+                title: '概述',
+                content: `
+                    <div class="req-highlight">
+                        <div class="req-section-title" style="border:none;padding:0;margin-bottom:6px;">📋 任务中心 - 需求文档</div>
+                        <p style="margin:0;color:#1e40af;font-size:13px;">本页面为广告投放平台的<strong>统一任务管理中心</strong>，整合了原有的「素材关停任务」功能，并新增了「广告配置批量调整任务」模块。</p>
+                    </div>
+                    
+                    <p class="req-section-title">📌 项目背景</p>
+                    <p>项目报表中存在大量对项目的<strong class="text-blue-600">批量操作</strong>需求。原有操作方式为同步执行，当操作量大、耗时长时会阻塞用户工作流。</p>
+                    <ul>
+                        <li><strong>核心问题</strong>：同步批量操作导致页面长时间等待，用户体验差</li>
+                        <li><strong>解决方案</strong>：将所有批量操作调整为<strong>异步执行</strong>方式，提交后生成异步任务</li>
+                        <li><strong>产物</strong>：需要一个<strong>任务列表</strong>来统一管理所有异步任务的执行状态与结果</li>
+                        <li><strong>演进</strong>：因此将原本独立的「素材关停任务」优化升级为<strong>「任务中心」</strong></li>
+                    </ul>
+
+                    <p class="req-section-title">🎯 核心目标</p>
+                    <ul>
+                        <li>将项目报表中对项目的<strong>批量操作全部改造为异步执行</strong>，通过任务列表追踪状态</li>
+                        <li>将分散的素材停用、广告配置调整等操作集中到统一的任务中心入口管理</li>
+                        <li>支持头条和腾讯两大媒体平台的不同操作类型差异化展示</li>
+                        <li>提供级联筛选 + 详情侧边栏的高效交互体验，方便运营人员监控任务进展</li>
+                        <li><strong style="color:#b45309;">新增：</strong>默认仅展示<strong>本人创建的任务</strong>，通过「操作对象数量」列快速了解每条任务的规模（关停多少素材/调整多少项目）</li>
+                    </ul>
+
+                    <div class="mt-4 p-3 bg-gradient-to-r from-slate-800 to-slate-700 rounded-lg text-white text-xs">
+                        <p class="font-semibold mb-1">📝 文档信息</p>
+                        <p class="opacity-80 m-0">版本：v2.0 | 模块：任务中心（工具 > 任务中心列表）</p>
+                        <p class="opacity-60 m-0 mt-1">基于原有「素材关停任务」功能扩展升级为统一任务管理中心</p>
+                    </div>
+
+                    <p class="text-xs text-gray-400 mt-3 text-center">💡 切换到后续各页时，原型中对应功能区域会自动高亮显示 ↓</p>
+                `
+            },
+            // ===== 第2页：主任务类型 =====
+            {
+                title: '主任务类型',
+                highlightTarget: 'filter-area',
+                content: `
+                    <p class="req-section-title">📦 两种主任务类型</p>
+                    <table class="req-table-mini">
+                        <tr>
+                            <th width="30%">任务类型</th>
+                            <th width="35%">说明</th>
+                            <th width="35%">来源</th>
+                        </tr>
+                        <tr>
+                            <td><span class="req-badge req-badge-old">原功能</span> 素材关停任务</td>
+                            <td>停用在投状态中的素材（异步执行）</td>
+                            <td>保留自旧版本</td>
+                        </tr>
+                        <tr>
+                            <td><span class="req-badge req-badge-new">新增</span> 广告配置批量调整任务</td>
+                            <td>对广告计划进行批量配置修改（异步执行）</td>
+                            <td>本次新增功能</td>
+                        </tr>
+                    </table>
+
+                    <p class="req-section-title mt-4">🔄 素材关停任务（子任务）</p>
+                    <p>该类型的子任务选项固定，不随媒体类型变化：</p>
+                    <ul>
+                        <li><code class="bg-gray-100 px-1 rounded text-xs">停用所有已选素材在投状态（个人）</code></li>
+                        <li><code class="bg-gray-100 px-1 rounded text-xs">停用所有已选素材在投状态（全员）</code></li>
+                    </ul>
+                    <p class="text-xs text-gray-500 mt-2">💡 个人/全员的区别在于素材归属权限范围不同。</p>
+
+                    <div class="req-highlight">
+                        <p class="font-semibold text-sm mb-1">⚠️ 重要：广告配置任务的子任务取决于媒体类型选择！</p>
+                        <p class="text-sm m-0">详见下一页 →</p>
+                    </div>
+
+                    <p class="text-xs text-blue-500 mt-3"><i class="fa fa-map-marker mr-1"></i> 对应原型区域：<b>筛选栏 — 主任务类型下拉框</b></p>
+                `
+            },
+            // ===== 第3页：子任务类型差异 =====
+            {
+                title: '子任务类型差异',
+                highlightTarget: 'subtask-area',
+                content: `
+                    <p class="req-section-title">📱 广告配置批量调整 — 子任务对照表</p>
+                    <p class="text-xs text-gray-500 mb-3">当媒体类型切换时，<strong>子任务下拉框会自动联动更新</strong>为对应媒体的可用操作项。</p>
+                    
+                    <div class="flex gap-3 mb-4">
+                        <!-- 头条 -->
+                        <div class="flex-1 bg-blue-50 rounded-lg p-3 border border-blue-100">
+                            <div class="font-bold text-blue-700 text-sm mb-2 flex items-center">
+                                <i class="fa fa-newspaper-o mr-1"></i> 头条（12项）
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-700">
+                                <span>✓ 启用</span><span>✓ 更改预算</span>
+                                <span>✓ 暂停</span><span>✓ 更改次日预算</span>
+                                <span>✓ 删除</span><span>✓ 更改ROI系数</span>
+                                <span>✓ 更改时间</span><span>✓ 更改时段</span>
+                                <span>✓ 更改地区</span><span>✓ 更改出价</span>
+                                <span>✓ 新建起量计划</span><span>✓ 关闭起量计划</span>
+                            </div>
+                        </div>
+                        <!-- 腾讯 -->
+                        <div class="flex-1 bg-green-50 rounded-lg p-3 border border-green-100">
+                            <div class="font-bold text-green-700 text-sm mb-2 flex items-center">
+                                <i class="fa fa-weixin mr-1"></i> 腾讯（11项）
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-gray-700">
+                                <span>✓ 启用</span><span>✓ 更改预算</span>
+                                <span>✓ 暂停</span><span>✓ 更改出价</span>
+                                <span>✓ 删除广告</span><span>✓ 更改深度出价</span>
+                                <span></span><span>✓ 更改ROI系数</span>
+                                <span></span><span>✓ 更改一键起量</span>
+                                <span>✓ 更改投放日期</span><span>✓ 更改投放时段</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="req-highlight bg-amber-50" style="background:linear-gradient(120deg,#fefce8 0%,#fef9c3 100%);">
+                        <p class="font-semibold text-amber-800 text-sm mb-1">🔑 关键差异点</p>
+                        <ul class="m-0 text-xs text-amber-900">
+                            <li>头条独有：<b>更改次日预算 / 更改地区 / 新建&关闭起量计划</b></li>
+                            <li>腾讯独有：<b>更改深度出价 / 更改一键起量</b></li>
+                            <li>腾讯将"启用"与"暂停"拆为<strong>两个独立子任务</strong>，可单独选择执行</li>
+                            <li>腾讯将"更改投放日期"和"更改投放时段"<strong>拆分为独立选项</strong>，支持单独操作</li>
+                        </ul>
+                    </div>
+
+                    <p class="text-xs text-blue-500 mt-3"><i class="fa fa-map-marker mr-1"></i> 对应原型区域：<b>筛选栏 — 子任务类型下拉框</b>（随媒体联动变化）</p>
+                `
+            },
+            // ===== 第4页：筛选与数据展示 =====
+            {
+                title: '筛选与数据展示',
+                highlightTarget: 'table-area',
+                content: `
+                    <p class="req-section-title">🔍 级联筛选机制</p>
+                    
+                    <div class="space-y-0">
+                        <div class="req-flow-step">
+                            <span class="req-flow-num">1</span>
+                            <div>
+                                <strong>创建时间范围</strong>
+                                <p class="text-xs text-gray-500 mt-0.5">支持日期区间筛选，限定任务的创建时间段</p>
+                            </div>
+                        </div>
+                        <div class="req-flow-step">
+                            <span class="req-flow-num">2</span>
+                            <div>
+                                <strong>主任务类型</strong>
+                                <p class="text-xs text-gray-500 mt-0.5">选择「素材关停任务」或「广告配置批量调整任务」</p>
+                            </div>
+                        </div>
+                        <div class="req-flow-step">
+                            <span class="req-flow-num">3</span>
+                            <div>
+                                <strong>媒体类型</strong>
+                                <p class="text-xs text-gray-500 mt-0.5">头条 / 腾讯 / 全部。默认选中「头条」</p>
+                            </div>
+                        </div>
+                        <div class="req-flow-step">
+                            <span class="req-flow-num">4</span>
+                            <div>
+                                <strong>子任务类型</strong>
+                                <p class="text-xs text-gray-500 mt-0.5">根据步骤2+3的组合自动加载可选子任务</p>
+                            </div>
+                        </div>
+                        <div class="req-flow-step">
+                            <span class="req-flow-num">5</span>
+                            <div>
+                                <strong>任务状态</strong>
+                                <p class="text-xs text-gray-500 mt-0.5">等待执行 / 正在执行 / 已完成 / 部分成功 / 已取消 / 失败</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                        <p class="font-semibold text-amber-800 text-sm mb-1">🔒 数据隔离（默认行为）</p>
+                        <p class="text-sm m-0 text-amber-900">表格<strong>默认仅展示当前登录用户本人创建的任务</strong>，无需手动筛选，系统自动按创建人过滤。</p>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <p class="font-semibold text-green-800 text-sm mb-1">💡 页面初始加载行为</p>
+                        <p class="text-sm m-0 text-green-900">默认显示全部匹配数据，<strong>无需手动点击查询</strong>按钮。切换任一筛选项即自动刷新。</p>
+                    </div>
+
+                    <p class="req-section-title mt-4">📊 表格列说明</p>
+                    <table class="req-table-mini">
+                        <tr><th width="25%">列名</th><th width="40%">说明</th><th width="35%">示例</th></tr>
+                        <tr><td>操作对象数量</td><td>该任务涉及的素材数/项目数</td><td><span class="inline-flex items-center justify-center h-6 px-2 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">7</span> = 7条素材</td></tr>
+                        <tr><td>创建人</td><td>任务提交者（系统默认仅显示本人任务）</td><td>卢佩诗 等</td></tr>
+                        <tr><td>任务进度</td><td>整体完成百分比（基于各子项进度）</td><td>86% → 大部分已完成</td></tr>
+                    </table>
+
+                    <p class="text-xs text-blue-500 mt-3"><i class="fa fa-map-marker mr-1"></i> 对应原型区域：<b>筛选栏 + 任务数据表格</b></p>
+                `
+            },
+            // ===== 第5页：任务详情侧边栏 =====
+            {
+                title: '任务详情侧边栏',
+                highlightTarget: 'sidebar',
+                content: `
+                    <div class="req-highlight" style="background:linear-gradient(120deg,#eff6ff 0%,#dbeafe 100%);">
+                        <p class="font-semibold text-blue-800 text-sm">📌 右侧详情面板已自动打开 →</p>
+                        <p class="text-xs text-blue-600 m-0 mt-1">点击表格行的「详情」按钮可切换不同任务的详情数据</p>
+                    </div>
+
+                    <p class="req-section-title">📋 详情查看交互</p>
+                    <p>点击表格行的<strong class="text-blue-600">「详情」</strong>按钮后，右侧滑出详情面板，覆盖70%屏幕宽度。</p>
+
+                    <div class="req-highlight">
+                        <p class="font-semibold text-sm mb-2">🔹 素材关停任务详情结构</p>
+                        <p class="text-sm m-0 mb-2">按<strong>批次号</strong>分组展开：</p>
+                        <table class="req-table-mini text-xs m-0">
+                            <tr><th>列名</th><th>内容示例</th></tr>
+                            <tr><td>素材名称</td><td>2026.03.13-福利首充+剑仙吸尘器...mp4</td></tr>
+                            <tr><td>广告名称</td><td>组件化创意-不指定创意形式_创意1...</td></tr>
+                            <tr><td>项目名称</td><td>mpjwlk_jzcqfyd5-测试-1-0304-5761</td></tr>
+                            <tr><td>执行进度</td><td>独立进度条（红/蓝/绿色）</td></tr>
+                            <tr><td>执行状态</td><td>已完成/正在执行/失败等标签</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="req-highlight" style="background:linear-gradient(120deg,#f0fdf4 0%,#dcfce7 100%);">
+                        <p class="font-semibold text-sm mb-2">🔹 广告配置批量调整详情结构</p>
+                        <p class="text-sm m-0 mb-2">根据媒体类型展示不同的明细字段：</p>
+                        
+                        <div class="flex gap-2 text-xs">
+                            <div class="flex-1">
+                                <span class="inline-block bg-blue-600 text-white rounded px-1.5 py-0.5 text-xs font-semibold mb-1">头条媒体</span>
+                                <table class="w-full text-xs"><tr><td class="bg-blue-50 p-1 rounded">媒体账号</td><td class="bg-blue-50 p-1 rounded">项目名称</td></tr></table>
+                            </div>
+                            <div class="flex-1">
+                                <span class="inline-block bg-green-600 text-white rounded px-1.5 py-0.5 text-xs font-semibold mb-1">腾讯媒体</span>
+                                <table class="w-full text-xs"><tr><td class="bg-green-50 p-1 rounded">媒体账号</td><td class="bg-green-50 p-1 rounded">广告名称</td></tr></table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="req-highlight bg-red-50" style="background:linear-gradient(120deg,#fef2f2 0%,#fee2e2 100%);">
+                        <p class="font-semibold text-red-800 text-sm mb-1">⚡ 排序规则</p>
+                        <p class="text-sm m-0 text-red-900">明细列表中，<strong>未成功的实例（失败/进行中）自动排在最前面</strong>，并用淡红色底色标注，方便快速定位异常。</p>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mt-3">💡 批次行支持<strong>点击展开/收起</strong>交互，每条明细有独立的进度条与状态。</p>
+                `
+            }
+        ];
+
+        let reqCurrentPage = 0;
+        let isMinimized = false;
+        let currentHighlightEl = null;
+
+        // 渲染需求文档指定页
+        function renderReqDocPage(pageIndex) {
+            const page = reqDocPages[pageIndex];
+            document.getElementById('reqDocPageTitle').textContent = page.title;
+            document.getElementById('reqDocContent').innerHTML = page.content;
+            document.getElementById('reqDocPageIndicator').textContent = `${pageIndex + 1} / ${reqDocPages.length}`;
+
+            // 同步收起状态的标题
+            document.getElementById('reqDocCollapsedTitle').textContent = page.title;
+            document.getElementById('reqDocCollapsedPage').textContent = `(${pageIndex + 1}/${reqDocPages.length})`;
+            document.getElementById('reqDocMiniTitle').textContent = page.title;
+
+            // 更新翻页按钮状态
+            document.getElementById('reqPrevPage').disabled = (pageIndex === 0);
+            document.getElementById('reqNextPage').disabled = (pageIndex === reqDocPages.length - 1);
+
+            // 更新圆点导航
+            updateReqDots();
+
+            // ===== 第五页（索引4）特殊处理：自动打开详情侧边栏 =====
+            if (pageIndex === 4) {
+                // 延迟一帧确保DOM已更新，再打开侧边栏
+                requestAnimationFrame(() => {
+                    openDetailSidebar(12); // 使用素材关停任务ID=12（头条-个人，含混合状态数据）
+                    // 等侧边栏展开动画完成（300ms）后高亮
+                    setTimeout(() => highlightPrototypeArea('sidebar'), 350);
+                });
+                return; // 高亮由上面的setTimeout触发
+            } else {
+                // 非第五页时，如果侧边栏开着则关闭它
+                closeDetailSidebar();
+            }
+
+            // 高亮原型对应区域
+            highlightPrototypeArea(page.highlightTarget || pageIndex);
+        }
+
+        /**
+         * 高亮原型中的对应功能区域
+         * @param {string|number|null} target - 目标标识或页码索引
+         */
+        function highlightPrototypeArea(target) {
+            // 先清除之前的高亮
+            clearPrototypeHighlight();
+
+            if (target === null || target === undefined) return; // 概述页不高亮
+
+            let selector = '';
+            let labelText = '';
+
+            switch(target) {
+                case 'filter-area':
+                case 1:
+                    selector = '.bg-white.rounded.shadow-sm.p-4.mb-4'; // 筛选栏容器
+                    labelText = '① 筛选联动区域';
+                    break;
+                case 'subtask-area':
+                case 2:
+                    selector = '.bg-white.rounded.shadow-sm.p-4.mb-4';
+                    labelText = '② 子任务联动区（受媒体类型影响）';
+                    break;
+                case 'table-area':
+                case 3:
+                    // 高亮整个内容区（筛选栏+表格）
+                    selector = 'main.flex-1.p-4.overflow-auto';
+                    labelText = '③ 筛选栏 + 数据表格';
+                    break;
+                case 'sidebar':
+                case 4:
+                    // 侧边栏：优先高亮已打开的详情侧边栏本身
+                    const sidebarEl = document.getElementById('taskDetailSidebar');
+                    if (sidebarEl && !sidebarEl.classList.contains('translate-x-full')) {
+                        createHighlightOverlay(sidebarEl.getBoundingClientRect(), '④ 任务详情侧边栏');
+                        return;
+                    }
+                    // 侧边栏未打开时，降级为引导提示
+                    selector = '.overflow-x-auto';
+                    labelText = '④ 点击「详情」按钮查看侧边栏 →';
+                    break;
+                default:
+                    return;
+            }
+
+            if (!selector) return;
+
+            const el = document.querySelector(selector);
+            if (!el) return;
+
+            createHighlightOverlay(el.getBoundingClientRect(), labelText);
+        }
+
+        /**
+         * 创建高亮覆盖层（公共方法）
+         * @param {DOMRect} rect - 目标元素的边界矩形
+         * @param {string} labelText - 标签文字
+         */
+        function createHighlightOverlay(rect, labelText) {
+            const overlay = document.createElement('div');
+            overlay.id = 'protoHighlightOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                left: ${rect.left - 3}px;
+                top: ${rect.top - 3}px;
+                width: ${rect.width + 6}px;
+                height: ${rect.height + 6}px;
+                border: 3px solid #3b82f6;
+                border-radius: 10px;
+                background-color: rgba(59, 130, 246, 0.06);
+                pointer-events: none;
+                z-index: 160;
+                transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.08);
+                animation: protoPulse 2s ease-in-out infinite;
+            `;
+            // 标签
+            const label = document.createElement('div');
+            label.style.cssText = `
+                position: absolute;
+                top: -28px;
+                left: 8px;
+                background: #3b82f6;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 3px 10px;
+                border-radius: 4px 4px 0 0;
+                white-space: nowrap;
+                letter-spacing: 0.3px;
+            `;
+            label.textContent = labelText;
+            overlay.appendChild(label);
+            document.body.appendChild(overlay);
+            currentHighlightEl = overlay;
+        }
+
+        // 清除原型高亮
+        function clearPrototypeHighlight() {
+            if (currentHighlightEl && currentHighlightEl.parentNode) {
+                currentHighlightEl.remove();
+            }
+            currentHighlightEl = null;
+        }
+
+        // 更新圆点导航
+        function updateReqDots() {
+            const container = document.getElementById('reqDocDots');
+            container.innerHTML = reqDocPages.map((_, i) =>
+                `<span class="w-2 h-2 rounded-full ${i === reqCurrentPage ? 'bg-blue-500 active' : 'bg-gray-300 hover:bg-gray-400'}"
+                      onclick="goToReqPage(${i})"></span>`
+            ).join('');
+        }
+
+        // 跳转到指定页
+        function goToReqPage(idx) {
+            if (idx >= 0 && idx < reqDocPages.length) {
+                reqCurrentPage = idx;
+                renderReqDocPage(reqCurrentPage);
+            }
+        }
+
+        // 收起/展开面板
+        function toggleReqDocPanel() {
+            isMinimized = !isMinimized;
+            const panel = document.getElementById('reqDocPanel');
+            const body = document.getElementById('reqDocBody');
+            const header = document.getElementById('reqDocHeader');
+            const collapsedBar = document.getElementById('reqDocCollapsedBar');
+            const collapseBtn = document.querySelector('#reqDocCollapse i');
+
+            if (isMinimized) {
+                // 收起：只保留标题条（可拖动）
+                body.classList.add('hidden');
+                header.classList.add('hidden');
+                collapsedBar.classList.remove('hidden');
+                panel.style.width = '300px';
+                panel.style.borderRadius = '8px';
+                collapseBtn.classList.remove('fa-chevron-down');
+                collapseBtn.classList.add('fa-chevron-up');
+                // 收起时清除高亮，避免遮挡视线
+                clearPrototypeHighlight();
+            } else {
+                // 展开
+                body.classList.remove('hidden');
+                header.classList.remove('hidden');
+                collapsedBar.classList.add('hidden');
+                panel.style.width = '400px';
+                panel.style.borderRadius = '8px';
+                collapseBtn.classList.remove('fa-chevron-up');
+                collapseBtn.classList.add('fa-chevron-down');
+                // 展开时恢复当前页的高亮
+                const currentPage = reqDocPages[reqCurrentPage];
+                highlightPrototypeArea(currentPage.highlightTarget || reqCurrentPage);
+            }
+        }
+
+        // 初始化需求文档面板
+        function initReqDocPanel() {
+            const panel = document.getElementById('reqDocPanel');
+            const header = document.getElementById('reqDocHeader');
+            const collapsedBar = document.getElementById('reqDocCollapsedBar');
+
+            // --- 注入高亮动画样式 ---
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes protoPulse {
+                    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.08); }
+                    50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.12); border-color: #60a5fa; }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // --- 拖动逻辑（支持展开头部 + 收起标题条） ---
+            let isDragging = false;
+            let dragOffsetX = 0, dragOffsetY = 0;
+
+            function startDrag(e) {
+                if (e.target.closest('#reqDocCollapse') || e.target.closest('#reqDocClose')) return;
+                isDragging = true;
+                const rect = panel.getBoundingClientRect();
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+                panel.style.transition = 'none';
+                e.preventDefault();
+            }
+
+            header.addEventListener('mousedown', startDrag);
+            collapsedBar.addEventListener('mousedown', startDrag);
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                let newX = e.clientX - dragOffsetX;
+                let newY = e.clientY - dragOffsetY;
+                newX = Math.max(0, Math.min(newX, window.innerWidth - panel.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - 20));
+                panel.style.left = newX + 'px';
+                panel.style.top = newY + 'px';
+                panel.style.right = 'auto';
+
+                // 拖动时重新定位高亮
+                if (currentHighlightEl && !isMinimized) {
+                    clearPrototypeHighlight();
+                    const currentPage = reqDocPages[reqCurrentPage];
+                    setTimeout(() => highlightPrototypeArea(currentPage.highlightTarget || reqCurrentPage), 50);
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    panel.style.transition = '';
+                }
+            });
+
+            // --- 翻页按钮 ---
+            document.getElementById('reqPrevPage').addEventListener('click', () => goToReqPage(reqCurrentPage - 1));
+            document.getElementById('reqNextPage').addEventListener('click', () => goToReqPage(reqCurrentPage + 1));
+
+            // --- 收起/展开 ---
+            document.getElementById('reqDocCollapse').addEventListener('click', toggleReqDocPanel);
+
+            // --- 关闭 ---
+            document.getElementById('reqDocClose').addEventListener('click', function() {
+                panel.style.display = 'none';
+                clearPrototypeHighlight();
+            });
+
+            // 初始渲染第1页
+            renderReqDocPage(0);
+        }
+
+        // DOMReady 时初始化
+        document.addEventListener('DOMContentLoaded', initReqDocPanel);
+    </script>
+</body>
+</html>
