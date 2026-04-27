@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工单系统交互原型与PRD演示</title>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --bg-light: #F5F7FA;
+            --border-color: #E4E4E4;
+            --text-main: #333;
+            --text-sub: #888;
+            --prd-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
+        }
+
+        body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; display: flex; height: 100vh; background: #EEE; overflow: hidden; }
+
+        /* --- 需求说明书 (PRD Overlay) --- */
+        .prd-overlay {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-80%);
+            width: 500px; background: #FFF; border: 2px solid var(--primary-color);
+            border-radius: 12px; box-shadow: var(--prd-shadow); z-index: 1000;
+            display: flex; flex-direction: column; pointer-events: auto;
+        }
+        .prd-header { padding: 12px 20px; border-bottom: 1px solid #EEE; display: flex; justify-content: space-between; align-items: center; background: #FAFBFF; border-radius: 10px 10px 0 0; }
+        .prd-header span { font-weight: bold; color: var(--primary-color); }
+        .prd-counter { font-size: 12px; color: #FFF; background: var(--primary-color); padding: 2px 10px; border-radius: 10px; }
+        .prd-body { padding: 20px; font-size: 14px; line-height: 1.6; color: #444; max-height: 300px; overflow-y: auto; }
+        .prd-footer { padding: 12px 20px; border-top: 1px solid #EEE; display: flex; justify-content: space-between; }
+        .prd-btn { padding: 6px 15px; border-radius: 4px; border: 1px solid var(--primary-color); background: #FFF; color: var(--primary-color); cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .prd-btn:hover { background: var(--primary-color); color: #FFF; }
+        .prd-btn:disabled { border-color: #CCC; color: #CCC; cursor: not-allowed; }
+
+        /* --- 原型区域 --- */
+        .main-workspace { flex: 1; display: flex; align-items: center; justify-content: center; color: #999; font-size: 24px; font-weight: bold; }
+        .sidebar { width: 340px; background: #FFF; display: flex; flex-direction: column; position: relative; border-left: 1px solid var(--border-color); }
+        
+        .tabs { display: flex; border-bottom: 1px solid var(--border-color); background: #FAFAFA; flex-shrink: 0; }
+        .tab-item { padding: 12px 0; font-size: 13px; color: var(--text-sub); flex: 1; text-align: center; cursor: pointer; }
+        .tab-item.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); font-weight: bold; }
+
+        .sidebar-content { flex: 1; padding: 15px; overflow-y: auto; }
+        .btn-create-trigger { width: 100%; padding: 10px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 15px; }
+
+        .filter-section { background: #F9F9F9; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; margin-bottom: 15px; }
+        .filter-item label { display: block; font-size: 11px; color: #666; margin-bottom: 3px; }
+        .filter-item input { width: 100%; padding: 5px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; box-sizing: border-box; }
+        .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .btn-search { width: 100%; padding: 7px; background: #FFF; color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 5px; }
+
+        /* --- 工单记录展示优化 --- */
+        .record-card { 
+            border: 1px solid var(--border-color); border-radius: 8px; 
+            padding: 12px; margin-bottom: 12px; cursor: pointer; 
+            background: #FFF; transition: all 0.2s; 
+        }
+        .record-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .id-text { font-size: 11px; color: #999; font-family: monospace; }
+        .status-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+        
+        .status-done { background: #F6FFED; color: #52C41A; border: 1px solid #B7EB8F; }
+        .status-processing { background: #E6F7FF; color: #1890FF; border: 1px solid #91D5FF; }
+        .status-pending { background: #FFF7E6; color: #FAAD14; border: 1px solid #FFE58F; }
+        
+        .card-title { font-size: 13px; font-weight: 600; line-height: 1.4; color: #333; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-info-box { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #F5F5F5; padding-top: 8px; }
+        .info-row { display: flex; justify-content: space-between; font-size: 11px; color: #888; }
+        .info-player { color: #555; }
+        /* --- 优化结束 --- */
+
+        .drawer { position: absolute; top: 0; right: -100%; width: 100%; height: 100%; background: #FFF; transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 100; display: flex; flex-direction: column; }
+        .drawer.active { right: 0; }
+        .drawer-header { padding: 12px 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; background: #FAFAFA; }
+        .back-btn { cursor: pointer; font-size: 20px; margin-right: 10px; color: #666; font-weight: bold; }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 15px; }
+        .drawer-footer { padding: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; background: #FAFAFA; }
+
+        /* 表单样式 */
+        .required::before { content: "*"; color: red; margin-right: 3px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        .detail-row { margin-bottom: 14px; }
+        .detail-label { font-size: 11px; color: #999; margin-bottom: 2px; }
+        .detail-value { font-size: 13px; color: #333; line-height: 1.4; word-break: break-all; }
+        .btn-copy-full { width: 100%; padding: 12px; background: var(--primary-color); color: #FFF; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="prd-overlay">
+        <div class="prd-header">
+            <span>📋 功能需求说明书</span>
+            <div class="prd-counter" id="prd_counter">1 / 4</div>
+        </div>
+        <div class="prd-body" id="prd_content"></div>
+        <div class="prd-footer">
+            <button class="prd-btn" id="prd_prev" onclick="changePRD(-1)">上一个说明</button>
+            <button class="prd-btn" id="prd_next" onclick="changePRD(1)">下一个说明</button>
+        </div>
+    </div>
+
+    <div class="main-workspace">企业微信 - 主工作区背景</div>
+
+    <div class="sidebar">
+        <div class="tabs">
+            <div class="tab-item">玩家资料</div>
+            <div class="tab-item active">工单系统</div>
+            <div class="tab-item">智能AI</div>
+        </div>
+
+        <div class="sidebar-content">
+            <button class="btn-create-trigger" id="btn_create_ui" onclick="openDrawer('createDrawer')">+ 创建新工单</button>
+            
+            <div class="filter-section" id="filter_area_ui">
+                <div class="filter-item">
+                    <label>创建时间范围</label>
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <input type="date" id="search_start">
+                        <span style="color:#CCC">-</span>
+                        <input type="date" id="search_end">
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>HT账号</label>
+                        <input type="text" id="search_ht" placeholder="输入账号">
+                    </div>
+                    <div class="filter-item">
+                        <label>游戏角色</label>
+                        <input type="text" id="search_role" placeholder="输入角色名">
+                    </div>
+                </div>
+                <button class="btn-search" onclick="filterTickets()">查询工单</button>
+            </div>
+
+            <div style="font-size:12px; color:#999; margin-bottom:10px;">工单历史 (<span id="count">5</span>)</div>
+            <div id="record_list"></div>
+        </div>
+
+        <div id="createDrawer" class="drawer">
+            <div class="drawer-header"><span class="back-btn" onclick="closeDrawer('createDrawer')">‹</span><strong>创建工单</strong></div>
+            <div class="drawer-body">
+                <div class="form-group"><label class="required">工单模板</label><select><option>充值未到账</option><option>区服冠名</option><option>其他</option></select></div>
+                <div class="form-group"><label class="required">原事业部</label><select><option>互动娱乐事业部-海外运营组</option><option>国内运营一部</option></select></div>
+                <div class="form-group"><label class="required">归属事业部</label><select><option>技术中心-中台研发部</option><option>通用事业部</option></select></div>
+                <div class="form-group"><label class="required">工单标题</label><input type="text" value="玩家反馈充值成功但钻石未到账异常"></div>
+                <div class="form-group"><label class="required">HT账号</label><input type="text" value="game_user_9527"></div>
+                <div class="form-group"><label>后台账号</label><input type="text" value="op_admin_v01"></div>
+                <div class="form-group"><label class="required">游戏名称</label><input type="text" value="《幻境觉醒》"></div>
+                <div class="form-group"><label class="required">游戏区服</label><input type="text" value="亚太2区-风暴祭坛"></div>
+                <div class="form-group"><label class="required">游戏角色名</label><input type="text" value="进击的萌新"></div>
+                <div class="form-group"><label>角色ID</label><input type="text" value="100086432"></div>
+                <div class="form-group"><label>充值金额</label><input type="text" value="648元"></div>
+                <div class="form-group"><label>工单内容</label><textarea rows="4">玩家于 2026年4月7日 14:30 通过内购渠道充值“6480钻石”档位...</textarea></div>
+                <div class="form-group"><label>截图/视频</label><div style="border: 1px dashed #DDD; padding: 10px; text-align: center; color: #AAA; font-size: 12px;">支持拖拽文件上传</div></div>
+                <div class="form-group"><label class="required">工单受理组</label><select><option>计费组</option><option>技术组</option></select></div>
+                <div class="form-group"><label class="required">工单受理人</label><select><option>李明</option><option>张三</option></select></div>
+            </div>
+            <div class="drawer-footer">
+                <button style="flex:1; padding:10px; border:1px solid #ddd; background:#fff; border-radius:4px;" onclick="closeDrawer('createDrawer')">取消</button>
+                <button style="flex:2; padding:10px; background:var(--primary-color); color:#fff; border:none; border-radius:4px; font-weight:bold;">确认创建</button>
+            </div>
+        </div>
+
+        <div id="detailDrawer" class="drawer">
+            <div class="drawer-header"><span class="back-btn" onclick="closeDrawer('detailDrawer')">‹</span><strong>工单详情</strong></div>
+            <div class="drawer-body" id="v_body"></div>
+            <div class="drawer-footer">
+                <button class="btn-copy-full" onclick="copyFull()">复制工单全文</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const db = [
+            { id: "N60407001", date: "2026-04-07", status: "status-done", stext: "已完结", title: "玩家反馈充值成功但钻石未到账异常", ht: "game_user_9527", op: "op_admin_v01", gname: "《幻境觉醒》", garea: "亚太2区-风暴祭坛", rname: "进击的萌新", rid: "100086432", amount: "648元", content: "玩家于 2026年4月7日 14:30 通过内购渠道充值“6480钻石”档位，支付记录显示成功，但游戏内账户余额未增加。后台查询该笔订单状态为“Pending(挂起)”，需技术介入核实并手动补发。" },
+            { id: "N60401005", date: "2026-04-01", status: "status-done", stext: "已完结", title: "区服冠名申请-亚太2区", ht: "tester_001", op: "op_admin_v01", gname: "《幻境觉醒》", garea: "亚太2区", rname: "幻境霸主", rid: "20001928", amount: "10000元", content: "玩家申请本区冠名权，已满足充值条件。" },
+            { id: "N60410012", date: "2026-04-10", status: "status-pending", stext: "未处理", title: "游戏异常-合作模式卡顿掉线", ht: "vip_player_888", op: "op_admin_v02", gname: "《幻境觉醒》", garea: "亚太1区", rname: "快乐小咸鱼", rid: "88888888", amount: "0元", content: "玩家反馈今日合作模式高频掉线。" },
+            { id: "N60412009", date: "2026-04-12", status: "status-processing", stext: "处理中", title: "投诉举报-疑似遇到外挂玩家", ht: "newbee_666", op: "op_admin_v01", gname: "《幻境觉醒》", garea: "亚太2区", rname: "无敌暴龙战士", rid: "66666666", amount: "6元", content: "玩家录屏举报对方在竞技场移动速度异常。" },
+            { id: "N60413022", date: "2026-04-13", status: "status-pending", stext: "未处理", title: "误操作申请-误分解极品装备", ht: "game_user_9527", op: "op_admin_v01", gname: "《幻境觉醒》", garea: "亚太2区-风暴祭坛", rname: "进击的萌新", rid: "100086432", amount: "648元", content: "玩家不小心分解了橙色武器，请求回档处理。" }
+        ];
+
+        const prdData = [
+            { step: "1 / 4", title: "页面布局与全局规范<br>此功能应用在创悦企业", content: "1. 右侧为企业微信侧边栏区域。<br>2. 采用抽屉式（Drawer）交互展示创建与详情。<br>3. 状态标签统一为：<b>已完结、处理中、未处理</b>。", action: () => { closeDrawer('createDrawer'); closeDrawer('detailDrawer'); } },
+            { step: "2 / 4", title: "工单记录展示优化", content: "1. <b>展示字段：</b>工单ID、工单标题、HT账号、游戏角色名、创建时间、状态。<br>2. <b>信息隔离：</b>工单ID与状态对齐；标题突出；玩家信息与时间通过细线分隔。<br>3. <b>可支持查询：</b>创建时间筛选、HT账号筛选、游戏角色筛选。", action: () => { closeDrawer('createDrawer'); closeDrawer('detailDrawer'); } },
+            { step: "3 / 4", title: "创建工单 (15个字段)", content: "1. 包含 15 个完整业务字段。<br>2. <b>必填项标注：</b>模板、事业部、标题、HT账号、游戏信息、受理组等 10 项标记红色 * 号。", action: () => { openDrawer('createDrawer'); } },
+            { step: "4 / 4", title: "工单详情 (9个核心字段)", content: "1. 详情页精简展示 9 个字段。<br>2. 点击复制按钮，将按格式抓取这 9 个字段的内容到剪贴板。", action: () => { closeDrawer('createDrawer'); showDetail(0); } }
+        ];
+
+        let prdIndex = 0;
+
+        function renderList(data) {
+            const list = document.getElementById('record_list');
+            list.innerHTML = data.map((item, index) => `
+                <div class="record-card" onclick="showDetail(${db.indexOf(item)})" data-date="${item.date}" data-ht="${item.ht}" data-role="${item.rname}">
+                    <div class="card-header">
+                        <span class="id-text">#${item.id}</span>
+                        <span class="status-tag ${item.status}">${item.stext}</span>
+                    </div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-info-box">
+                        <div class="info-row">
+                            <span class="info-player">${item.ht} / ${item.rname}</span>
+                        </div>
+                        <div class="info-row">
+                            <span>创建时间：${item.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('count').innerText = data.length;
+        }
+
+        function filterTickets() {
+            const start = document.getElementById('search_start').value;
+            const end = document.getElementById('search_end').value;
+            const ht = document.getElementById('search_ht').value.toLowerCase();
+            const role = document.getElementById('search_role').value.toLowerCase();
+            const filtered = db.filter(item => {
+                const dateMatch = (!start || item.date >= start) && (!end || item.date <= end);
+                const htMatch = !ht || item.ht.toLowerCase().includes(ht);
+                const roleMatch = !role || item.rname.toLowerCase().includes(role);
+                return dateMatch && htMatch && roleMatch;
+            });
+            renderList(filtered);
+        }
+
+        function showDetail(index) {
+            const data = db[index];
+            const html = `
+                <div class="detail-row"><div class="detail-label">工单标题</div><div class="detail-value" id="c_title" style="font-weight:bold;">${data.title}</div></div>
+                <div class="detail-row"><div class="detail-label">HT账号</div><div class="detail-value" id="c_ht">${data.ht}</div></div>
+                <div class="detail-row"><div class="detail-label">后台账号</div><div class="detail-value" id="c_op">${data.op}</div></div>
+                <div class="detail-row"><div class="detail-label">游戏名称</div><div class="detail-value" id="c_gname">${data.gname}</div></div>
+                <div class="detail-row"><div class="detail-label">游戏区服</div><div class="detail-value" id="c_garea">${data.garea}</div></div>
+                <div class="detail-row"><div class="detail-label">游戏角色名</div><div class="detail-value" id="c_rname">${data.rname}</div></div>
+                <div class="detail-row"><div class="detail-label">角色ID</div><div class="detail-value" id="c_rid">${data.rid}</div></div>
+                <div class="detail-row"><div class="detail-label">充值金额</div><div class="detail-value" id="c_amount">${data.amount}</div></div>
+                <div class="detail-row"><div class="detail-label">工单内容</div><div class="detail-value" id="c_content">${data.content}</div></div>
+            `;
+            document.getElementById('v_body').innerHTML = html;
+            openDrawer('detailDrawer');
+        }
+
+        function copyFull() {
+            const fields = ["工单标题", "HT账号", "后台账号", "游戏名称", "游戏区服", "游戏角色名", "角色ID", "充值金额", "工单内容"];
+            const ids = ["c_title", "c_ht", "c_op", "c_gname", "c_garea", "c_rname", "c_rid", "c_amount", "c_content"];
+            let text = fields.map((f, i) => `${f}: ${document.getElementById(ids[i]).innerText}`).join('\n');
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            alert("已成功复制 9 个核心字段！");
+        }
+
+        function openDrawer(id) { document.getElementById(id).classList.add('active'); }
+        function closeDrawer(id) { document.getElementById(id).classList.remove('active'); }
+
+        function updatePRD() {
+            const current = prdData[prdIndex];
+            document.getElementById('prd_counter').innerText = current.step;
+            document.getElementById('prd_content').innerHTML = `<h3>${current.title}</h3><p>${current.content}</p>`;
+            document.getElementById('prd_prev').disabled = prdIndex === 0;
+            document.getElementById('prd_next').disabled = prdIndex === prdData.length - 1;
+            current.action();
+        }
+
+        function changePRD(dir) { prdIndex += dir; updatePRD(); }
+
+        renderList(db);
+        updatePRD();
+    </script>
+</body>
+</html>
